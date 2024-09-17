@@ -307,6 +307,7 @@ namespace launcher {
             } else {
                 p.shadow.top = s.top
             }
+            s.z = p.shadow.z + 1
         }
 
         let dir: number = p.direction
@@ -319,11 +320,13 @@ namespace launcher {
             let y: number = Math.min(Math.max(Math.floor(x * Math.tan(getAngle(player))), 1), img.width - 3)
             img.drawRect(x - 3, y, 2, 2, MARKER_FILL_COLOR)
             img.drawRect(x - 4, y - 1, 4, 4, MARKER_BORDER_COLOR)
+            img.drawLine(1, 1, x, y, MARKER_BORDER_COLOR)
         } else {
             let y: number = 20
             let x: number = Math.min(Math.max(Math.floor(y / Math.tan(getAngle(player))), 1), img.width - 3)
             img.drawRect(x, y - 3, 2, 2, MARKER_FILL_COLOR)
             img.drawRect(x - 1, y - 4, 4, 4, MARKER_BORDER_COLOR)
+            img.drawLine(1, 1, x, y, MARKER_BORDER_COLOR)
         }
     }
 }
