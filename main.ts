@@ -5,9 +5,11 @@ namespace SpriteKind {
     export const FB4 = SpriteKind.create()
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    info.changeScoreBy(-1)
     launcher.launchFootball(1)
 })
 controller.player2.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
+    info.player2.changeScoreBy(-1)
     launcher.launchFootball(2)
 })
 sprites.onOverlap(SpriteKind.P2Football, SpriteKind.Target, function (sprite, otherSprite) {
@@ -43,6 +45,7 @@ controller.player2.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.P
     launcher.increaseAngle(2)
 })
 controller.player4.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
+    info.player4.changeScoreBy(-1)
     launcher.launchFootball(4)
 })
 controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Pressed, function () {
@@ -64,6 +67,7 @@ controller.player4.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Pr
     launcher.decreaseAngle(4)
 })
 controller.player3.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
+    info.player3.changeScoreBy(-1)
     launcher.launchFootball(3)
 })
 controller.player4.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Pressed, function () {
