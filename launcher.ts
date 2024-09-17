@@ -20,6 +20,11 @@ interface FbLauncher {
     invertY: boolean
 }
 
+interface Point {
+    x: number
+    y: number
+}
+
 //% color=#AF7817 icon="\uf44e"
 namespace launcher {
     const DIRECTION_DIVISIONS: number = 8
@@ -84,6 +89,7 @@ namespace launcher {
         } else {
             fb = sprites.create(fbImage, SpriteKind.Projectile)
         }
+        fb.setFlag(SpriteFlag.AutoDestroy, true)
 
         switch (player) {
             case 1:
@@ -105,21 +111,21 @@ namespace launcher {
         
         let p: FbLauncher = launchers[player]
         let s: Sprite = p.sprite
+        let theta: number = getAngle(player)
+        let vx: number = Math.cos(theta) * fbSpeed
+        let vy: number = Math.sin(theta) * fbSpeed
         if (p.invertX) {
             fb.right = s.right
+            vx = 0 - vx
         } else {
             fb.left = s.left
         }
         if (p.invertY) {
             fb.bottom = s.bottom
+            vy = 0 - vy
         } else {
             fb.top = s.top
         }
-        fb.setFlag(SpriteFlag.AutoDestroy, true)
-
-        let theta: number = getAngle(player)
-        let vx: number = Math.cos(theta) * fbSpeed
-        let vy: number = Math.sin(theta) * fbSpeed
         fb.setVelocity(vx, vy)
     }
 
@@ -292,7 +298,7 @@ namespace launcher {
 
         if (p.shadow === null) {
             let s: Sprite = p.sprite
-            let w: number = Math.max(s.width, s.height) + 4
+            let w: number = Math.max(s.width, s.height) + 8
             p.shadowImage = image.create(w, w)
             p.shadow = sprites.create(
                 p.shadowImage, SpriteKind.Player
@@ -314,19 +320,31 @@ namespace launcher {
         let img: Image = p.shadowImage
         img.fill(0)
         // temporary border
-        img.drawRect(0, 0, img.width, img.height, 1)
+        // img.drawRect(0, 0, img.width, img.height, 1)
+        let origin: Point = {x: 1, y: 1}
+        let marker: Point = {x: 0, y: 0}
         if (dir < 5) {
-            let x: number = img.width
-            let y: number = Math.min(Math.max(Math.floor(x * Math.tan(getAngle(player))), 1), img.width - 3)
-            img.drawRect(x - 3, y, 2, 2, MARKER_FILL_COLOR)
-            img.drawRect(x - 4, y - 1, 4, 4, MARKER_BORDER_COLOR)
-            img.drawLine(1, 1, x, y, MARKER_BORDER_COLOR)
+            marker.x = img.width - 3
+            marker.y = Math.min(Math.max(Math.floor(
+                marker.x * Math.tan(getAngle(player))), 1), img.width - 3)
         } else {
-            let y: number = 20
-            let x: number = Math.min(Math.max(Math.floor(y / Math.tan(getAngle(player))), 1), img.width - 3)
-            img.drawRect(x, y - 3, 2, 2, MARKER_FILL_COLOR)
-            img.drawRect(x - 1, y - 4, 4, 4, MARKER_BORDER_COLOR)
-            img.drawLine(1, 1, x, y, MARKER_BORDER_COLOR)
+            marker.y = img.width - 3
+            marker.x = Math.min(Math.max(Math.floor(
+                marker.y / Math.tan(getAngle(player))), 1), img.width - 3)
         }
+        let mid: number = img.width / 2
+        if (p.invertX) {
+            origin.x = img.width - 1
+            marker.x = mid + mid - marker.x // mid - (marker.x - mid)
+        }
+        if (p.invertY) {
+            origin.y = img.width - 1
+            marker.y = mid + mid - marker.y - 2 // mid - (marker.y - mid)
+            img.drawLine(origin.x, origin.y, marker.x, marker.y + 2, MARKER_BORDER_COLOR)
+        } else {
+            img.drawLine(origin.x, origin.y, marker.x, marker.y, MARKER_BORDER_COLOR)
+        }
+        img.drawRect(marker.x, marker.y, 2, 2, MARKER_FILL_COLOR)
+        img.drawRect(marker.x - 1, marker.y - 1, 4, 4, MARKER_BORDER_COLOR)
     }
 }
