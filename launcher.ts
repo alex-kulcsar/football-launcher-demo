@@ -29,7 +29,6 @@ interface Point {
 namespace launcher {
     const DIRECTION_DIVISIONS: number = 8
     const MARKER_FILL_COLOR: number = 1
-    const MARKER_BORDER_COLOR: number = 10
     const FOOTBALL_KINDS: number[] = [
         SpriteKind.P1Football,
         SpriteKind.P2Football,
@@ -46,6 +45,7 @@ namespace launcher {
     let targets: Sprite[] = []
     let roundLength: number = 30
     let targetSpeedup: number = 10
+    let markerColors: number[] = [10, 10, 10, 10, 10]
 
     //% block
     export function addRound(vx: number, vy: number): void {
@@ -66,7 +66,7 @@ namespace launcher {
     //% block
     //% player.defl=1
     export function decreaseAngle(player: number): void {
-        if (player < 0 || player > 4) {
+        if (player < 1 || player > 4) {
             return
         }
         if (launchers[player].direction > 0) {
@@ -78,7 +78,7 @@ namespace launcher {
     //% block
     //% player.defl=1
     export function launchFootball(player: number): void {
-        if (player < 0 || player > 4) {
+        if (player < 1 || player > 4) {
             // Probably should throw an error,
             // + but we'll be nice. :-)
             return
@@ -132,7 +132,7 @@ namespace launcher {
     //% block
     //% player.defl=1
     export function increaseAngle(player: number): void {
-        if (player < 0 || player > 4) {
+        if (player < 1 || player > 4) {
             return
         }
         if (launchers[player].direction < DIRECTION_DIVISIONS) {
@@ -171,13 +171,24 @@ namespace launcher {
         fbSpeed = speed
     }
 
+    //% block
+    //% player.defl=1
+    //% color.shadow=colorindexpicker
+    export function setMarkerColor(player: number, color: number): void {
+        if (player < 1 || player > 4) {
+            return
+        }
+        markerColors[player] = color
+        updateShadow(player)
+    }
+
     //% block="set sprite $sprite for player $player"
     //% player.defl=1
     export function setPlayerSprite(sprite: Sprite, player: number): void {
         if (needsInit) {
             init()
         }
-        if (player < 0 || player > 4) {
+        if (player < 1 || player > 4) {
             return
         }
         let p: FbLauncher = launchers[player]
@@ -287,6 +298,9 @@ namespace launcher {
             init()
             return
         }
+        if (player < 1 || player > 4) {
+            return
+        }
 
         let p: FbLauncher = launchers[player]
 
@@ -323,6 +337,7 @@ namespace launcher {
         // img.drawRect(0, 0, img.width, img.height, 1)
         let origin: Point = {x: 1, y: 1}
         let marker: Point = {x: 0, y: 0}
+        let color: number = markerColors[player]
         if (dir < 5) {
             marker.x = img.width - 3
             marker.y = Math.min(Math.max(Math.floor(
@@ -340,11 +355,19 @@ namespace launcher {
         if (p.invertY) {
             origin.y = img.width - 1
             marker.y = mid + mid - marker.y - 2 // mid - (marker.y - mid)
-            img.drawLine(origin.x, origin.y, marker.x, marker.y + 2, MARKER_BORDER_COLOR)
+            img.drawLine(origin.x, origin.y, marker.x, marker.y + 2, color)
+            img.drawLine(origin.x - 1, origin.y, marker.x - 1, marker.y + 2, color)
+            img.drawLine(origin.x + 1, origin.y, marker.x + 1, marker.y + 2, color)
+            img.drawLine(origin.x, origin.y + 1, marker.x, marker.y + 3, color)
+            img.drawLine(origin.x, origin.y - 1, marker.x, marker.y + 1, color)
         } else {
-            img.drawLine(origin.x, origin.y, marker.x, marker.y, MARKER_BORDER_COLOR)
+            img.drawLine(origin.x, origin.y, marker.x, marker.y, color)
+            img.drawLine(origin.x - 1, origin.y - 1, marker.x - 1, marker.y - 1, color)
+            img.drawLine(origin.x + 1, origin.y + 1, marker.x + 1, marker.y + 1, color)
+            img.drawLine(origin.x, origin.y - 1, marker.x, marker.y - 1, color)
+            img.drawLine(origin.x, origin.y + 1, marker.x, marker.y + 1, color)
         }
         img.drawRect(marker.x, marker.y, 2, 2, MARKER_FILL_COLOR)
-        img.drawRect(marker.x - 1, marker.y - 1, 4, 4, MARKER_BORDER_COLOR)
+        img.drawRect(marker.x - 1, marker.y - 1, 4, 4, color)
     }
 }
